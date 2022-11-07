@@ -63,6 +63,10 @@ public class Figure {
         currentPoints = points;
     }
 
+    public void reset() {
+        toMatrix();
+    }
+
     public List<Vertex> to2D(){
         List<Vertex> projection = new ArrayList<>();
         double [] res;
