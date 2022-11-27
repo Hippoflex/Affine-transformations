@@ -1,5 +1,6 @@
 package org.example;
 
+import javax.swing.*;
 import java.util.*;
 
 public class Figure {
@@ -7,59 +8,55 @@ public class Figure {
     Matrix matrix = new Matrix();
 
     List<Vertex> vertexList = Arrays.asList(
-            new Vertex(0, 3, 3, 0),
-            new Vertex(1, 3, 9, 0),
-            new Vertex(2, 9 ,9, 0),
-            new Vertex(3, 9, 3, 0),
-            new Vertex(4, 7, 3, 0),
-            new Vertex(5, 7, 7, 0),
-            new Vertex(6, 5, 7, 0),
-            new Vertex(7, 5, 3, 0),
-            new Vertex(8, 3, 3, 3),
-            new Vertex(9, 3, 9, 3),
-            new Vertex(10, 9 ,9, 3),
-            new Vertex(11, 9, 3, 3),
-            new Vertex(12, 7, 3, 3),
-            new Vertex(13, 7, 7, 3),
-            new Vertex(14, 5, 7, 3),
-            new Vertex(15, 5, 3, 3)
+            new Vertex(3, 3, 0),
+            new Vertex(5, 4, 2),
+            new Vertex(9, 4, 2),
+            new Vertex(7, 3, 0),
+            new Vertex(3, 7, 0),
+            new Vertex(5, 8, 2),
+            new Vertex(9, 8, 2),
+            new Vertex(7, 7, 0)
     );
+
+    public List<Vertex> getVertexList() {
+        return vertexList;
+    }
 
     List<Edge> edgeList = Arrays.asList(
             new Edge(0, 1),
-            new Edge(0, 7),
             new Edge(1, 2),
-            new Edge(1, 9),
             new Edge(2, 3),
-            new Edge(2, 10),
-            new Edge(3, 4),
-            new Edge(3, 11),
+            new Edge(3, 0),
             new Edge(4, 5),
-            new Edge(4, 12),
             new Edge(5, 6),
-            new Edge(5, 13),
             new Edge(6, 7),
-            new Edge(6, 14),
-            new Edge(7, 0),
-            new Edge(7, 15),
-            new Edge(8, 9),
-            new Edge(9, 10),
-            new Edge(10, 11),
-            new Edge(11, 12),
-            new Edge(12, 13),
-            new Edge(13, 14),
-            new Edge(14, 15),
-            new Edge(8, 15),
-            new Edge(0, 8)
+            new Edge(7, 4),
+            new Edge(0, 4),
+            new Edge(1, 5),
+            new Edge(2, 6),
+            new Edge(3, 7)
     );
 
-    Map<Integer, double[]> currentPoints = new HashMap<>();
+    List<Plane> planeList = Arrays.asList(
+            new Plane(0, 1, 2, 3),
+            new Plane(4, 5, 6, 7),
+            new Plane(0, 1, 5, 4),
+            new Plane(2, 3, 7, 6),
+            new Plane(1, 2, 6, 5),
+            new Plane(0, 3, 7, 4)
+    );
+
+    public List<Plane> getPlaneList() {
+        return planeList;
+    }
+
+    List<double[]> currentPoints = new ArrayList<>();
 
     public void toMatrix(){
-        Map<Integer, double[]> points = new HashMap<>();
+        List<double[]> points = new ArrayList<>();
 
         vertexList.forEach(vertex ->
-                points.put(vertex.n, new double[]{vertex.x, vertex.y, vertex.z, 1.0f}));
+                points.add(new double[]{vertex.x, vertex.y, vertex.z, 1.0f}));
         currentPoints = points;
     }
 
@@ -72,48 +69,63 @@ public class Figure {
         double [] res;
         double c;
 
-        for (var entry: currentPoints.entrySet()) {
-            res = entry.getValue();
+        for (double[] points: currentPoints) {
+            res = points;
             c = res[3];
             res = matrix.multipleWithVector(res, Matrix.projection());
 
-        projection.add(new Vertex(entry.getKey(),res[0]/c, res[1]/c, res[2]/c));
+        projection.add(new Vertex(res[0]/c, res[1]/c, res[2]/c));
         }
 
         return projection;
     }
 
     public void transfer(double x, double y, double z){
-        Map<Integer, double[]> newPoints = new HashMap<>();
+        List<double[]> newPoints = new ArrayList<>();
         double [] res;
 
-        for (var entry: currentPoints.entrySet()){
-            res = matrix.multipleWithVector(entry.getValue(), Matrix.transfer(x, y, z));
-            newPoints.put(entry.getKey(), res);
+        for (double[] points: currentPoints){
+            res = matrix.multipleWithVector(points, Matrix.transfer(x, y, z));
+            newPoints.add(res);
         }
         currentPoints = newPoints;
     }
 
 
     public void rotation(Axis axis, double toRadians) {
-        Map<Integer, double[]> newPoints = new HashMap<>();
+        List<double[]> newPoints = new ArrayList<>();
         double [] res;
 
-        for (var entry: currentPoints.entrySet()){
-            res = matrix.multipleWithVector(entry.getValue(), Matrix.rotation(axis, toRadians));
-            newPoints.put(entry.getKey(), res);
+        for (double[] points: currentPoints){
+            res = matrix.multipleWithVector(points, Matrix.rotation(axis, toRadians));
+            newPoints.add(res);
         }
         currentPoints = newPoints;
     }
 
     public void scaling(double x, double y, double z) {
-        Map<Integer, double[]> newPoints = new HashMap<>();
+        List<double[]> newPoints = new ArrayList<>();
         double [] res;
 
-        for (var entry: currentPoints.entrySet()){
-            res = matrix.multipleWithVector(entry.getValue(), Matrix.scaling(x, y, z));
-            newPoints.put(entry.getKey(), res);
+        for (double[] points: currentPoints){
+            res = matrix.multipleWithVector(points, Matrix.scaling(x, y, z));
+            newPoints.add(res);
         }
         currentPoints = newPoints;
     }
+
+    public Vertex getCenter(){
+        double x = 0;
+        double y = 0;
+        double z = 0;
+
+        for (int i = 0; i< vertexList.size(); i++){
+            x += vertexList.get(i).x;
+            y += vertexList.get(i).y;
+            z += vertexList.get(i).z;
+        }
+
+        return new Vertex(x / vertexList.size(), y / vertexList.size(), z / vertexList.size());
+    }
+
 }

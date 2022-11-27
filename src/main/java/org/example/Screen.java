@@ -88,12 +88,39 @@ public class Screen extends ApplicationAdapter {
         render.setColor(Color.ORANGE);
 
         List<Vertex> finalVertex = vertex;
-        figure.edgeList.forEach(edge -> render.line(
-                (float) finalVertex.get(edge.firstPoint).x *      SCALE +    OFFSET_X,
-                (float) finalVertex.get(edge.firstPoint).y *      SCALE +    OFFSET_Y,
-                (float) finalVertex.get(edge.secondPoint).x *     SCALE +    OFFSET_X,
-                (float) finalVertex.get(edge.secondPoint).y *     SCALE +    OFFSET_Y
-        ));
+
+        for(int i = 0; i < figure.planeList.size(); i++) {
+            if (Roberts.IsVisible(figure, figure.planeList.get(i))){
+                figure.planeList.forEach(plane -> render.line(
+                        (float) finalVertex.get(plane.firstPoint).x * SCALE + OFFSET_X,
+                        (float) finalVertex.get(plane.firstPoint).y * SCALE + OFFSET_Y,
+                        (float) finalVertex.get(plane.secondPoint).x * SCALE + OFFSET_X,
+                        (float) finalVertex.get(plane.secondPoint).y * SCALE + OFFSET_Y
+                ));
+
+                figure.planeList.forEach(plane -> render.line(
+                        (float) finalVertex.get(plane.secondPoint).x * SCALE + OFFSET_X,
+                        (float) finalVertex.get(plane.secondPoint).y * SCALE + OFFSET_Y,
+                        (float) finalVertex.get(plane.thirdPoint).x * SCALE + OFFSET_X,
+                        (float) finalVertex.get(plane.thirdPoint).y * SCALE + OFFSET_Y
+                ));
+
+                figure.planeList.forEach(plane -> render.line(
+                        (float) finalVertex.get(plane.thirdPoint).x * SCALE + OFFSET_X,
+                        (float) finalVertex.get(plane.thirdPoint).y * SCALE + OFFSET_Y,
+                        (float) finalVertex.get(plane.fourthPoint).x * SCALE + OFFSET_X,
+                        (float) finalVertex.get(plane.fourthPoint).y * SCALE + OFFSET_Y
+                ));
+
+                figure.planeList.forEach(plane -> render.line(
+                        (float) finalVertex.get(plane.fourthPoint).x * SCALE + OFFSET_X,
+                        (float) finalVertex.get(plane.fourthPoint).y * SCALE + OFFSET_Y,
+                        (float) finalVertex.get(plane.firstPoint).x * SCALE + OFFSET_X,
+                        (float) finalVertex.get(plane.firstPoint).y * SCALE + OFFSET_Y
+                ));
+            }
+        }
+
 
         render.end();
     }
